@@ -172,7 +172,7 @@ def getAstronomy():
     return render_template('category.html', 
     category = category, cat_name = cat_name)
 
-
+# login route that takes you to the fine google button
 @app.route('/login')
 def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.
@@ -182,7 +182,7 @@ def login():
     state = login_session['state'], 
     CLIENT_ID = CLIENT_ID)
 
-
+# google login
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     if request.args.get('state') != login_session['state']:
@@ -236,12 +236,13 @@ def gconnect():
     login_session['access-token'] = access_token
     login_session['google_id'] = google_id
 
-    #Get user info
+    # Get user info
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo/"
     params = {'access_token': access_token, 'alt':'json'}
     answer = requests.get(userinfo_url, params=params)
     data = answer.json()
 
+    # set login sessions
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
@@ -254,7 +255,7 @@ def gconnect():
     login_session['user_id'] = user_id
 
     output = ''
-    output += '<h1>Welcome'
+    output += '<h1>Welcome '
     output += login_session['username']
     output += '</h1>'
     output += '<img src="'
@@ -304,7 +305,9 @@ def gdisconnect():
         return response
 
 
-# Helper function
+# Helper functions
+
+# creates new user
 def createUser(login_session):
     session = DBSession()
     new_user = User(name = login_session['username'], 
@@ -318,13 +321,13 @@ def createUser(login_session):
         email = login_session['email']).one()
     return user.id
 
-
+# gets user information
 def getUserInfo(user_id):
     session = DBSession()
     user = session.query(User).filter_by(id = user_id).one()
     return user
 
-
+# gets user id
 def getUserId(email):
     try:
         session = DBSession()
@@ -334,10 +337,21 @@ def getUserId(email):
         return None
 
 #JSON ENDPOINTS
-@app.route('/')
-@app.route('/')
-@app.route('/')
+@app.route('/catalog/<int:item_id>/item/JSON')
+# get a specific item in json format
+def getItemJSON(item_id):
+    session = DBSession()
+    item = session.query(Item).filter_by(id = item_id).one()
+    return jsonify(item = [item.serialize])
+
+# all items in json format
+@app.route('/catalog/JSON')
+def getAllItemJSON():
+    session = DBSession()
+    all_items = session.query(Item).order_by((Item.id).desc())
+    return jsonify(all_items = [item.serialize for item in all_items])
 
 
 if __name__ == '__main__':
     app.debug = True
+    app.run(host='0.0.0.0', port=8000)
