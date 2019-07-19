@@ -14,6 +14,8 @@
         <h5>{{item.name}}</h5>
         <p><b>{{item.description}}</b></p>
         <span>
+                <a href="{{url_for('editItem', item_id = item.id)}}"><b>Edit</b></a>
+                <a href="{{url_for('deleteItem', item_id = item.id)}}"><b>Delete</b></a>
         </span>
     </div>
 </body>

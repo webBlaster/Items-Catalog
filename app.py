@@ -20,7 +20,8 @@ import requests
 
 app = Flask(__name__)
 
-CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+CLIENT_ID = json.loads(open('client_secrets.json', 
+'r').read())['web']['client_id']
 
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
@@ -33,9 +34,11 @@ def allItems():
     session = DBSession()
     all_items = session.query(Item).order_by((Item.id).desc())
     if 'username' in login_session:
-        return render_template('authcatalog.html', all_items = all_items)
+        return render_template('authcatalog.html', 
+        all_items = all_items)
     else:
-        return render_template('catalog.html', all_items = all_items)
+        return render_template('catalog.html', 
+        all_items = all_items)
 
 
 # adds a new item
@@ -49,7 +52,12 @@ def addItem():
         category = request.form['category']
         user_id = login_session['user_id']
         session = DBSession()
-        new_item = Item(name = name, description = description, category = category, user_id = user_id)
+        new_item = Item(
+            name = name, 
+            description = description, 
+            category = category, 
+            user_id = user_id)
+
         session.add(new_item)
         session.commit()
         return redirect(url_for('allItems'))
@@ -85,7 +93,8 @@ def deleteItem(item_id):
     if 'username' not in login_session:
         return redirect('/login')
     session = DBSession()
-    item_deleting = session.query(Item).filter_by(id = item_id).one()
+    item_deleting = session.query(Item).filter_by(
+        id = item_id).one()
     if item_deleting.user_id != login_session['user_id']:
         output = "you are unauthorized to delete this item"
         return output
@@ -102,7 +111,9 @@ def deleteItem(item_id):
 def viewItem(item_id):
     session = DBSession()
     item = session.query(Item).filter_by(id = item_id).one()
-    if 'username' not in login_session and item.user_id != login_session['user_id']:
+    if 'username' not in login_session:
+        return render_template('publicitem.html', item = item)
+    if item.user_id != login_session['user_id']:
         return render_template('publicitem.html', item = item)
     return render_template('item.html', item = item)
 
@@ -112,8 +123,10 @@ def viewItem(item_id):
 def getElectronics():
     session = DBSession()
     cat_name = 'Electronics'
-    category = session.query(Item).filter_by(category = cat_name).all()
-    return render_template('category.html', category = category, cat_name = cat_name)
+    category = session.query(Item).filter_by(
+        category = cat_name).all()
+    return render_template('category.html', 
+    category = category, cat_name = cat_name)
 
 
 # gets all items in the groceries category
@@ -121,8 +134,10 @@ def getElectronics():
 def getGroceries():
     session = DBSession()
     cat_name = 'Groceries'
-    category = session.query(Item).filter_by(category = cat_name).all()
-    return render_template('category.html', category = category, cat_name = cat_name)
+    category = session.query(Item).filter_by(
+        category = cat_name).all()
+    return render_template('category.html', 
+    category = category, cat_name = cat_name)
 
 
 # gets all items in the clothing category
@@ -130,8 +145,10 @@ def getGroceries():
 def getClothing():
     session = DBSession()
     cat_name = 'Clothing'
-    category = session.query(Item).filter_by(category = cat_name).all()
-    return render_template('category.html', category = category, cat_name = cat_name)
+    category = session.query(Item).filter_by(
+        category = cat_name).all()
+    return render_template('category.html', 
+    category = category, cat_name = cat_name)
 
 
 # gets all items in the footwear category
@@ -139,8 +156,10 @@ def getClothing():
 def getFootwear():
     session = DBSession()
     cat_name = 'Footwear'
-    category = session.query(Item).filter_by(category = cat_name).all()
-    return render_template('category.html', category = category, cat_name = cat_name)
+    category = session.query(Item).filter_by(
+        category = cat_name).all()
+    return render_template('category.html', 
+    category = category, cat_name = cat_name)
 
 
 # gets all items in the astronomy category
@@ -148,8 +167,10 @@ def getFootwear():
 def getAstronomy():
     session = DBSession()
     cat_name = 'Astronomy'
-    category = session.query(Item).filter_by(category = cat_name).all()
-    return render_template('category.html', category = category, cat_name = cat_name)
+    category = session.query(Item).filter_by(
+        category = cat_name).all()
+    return render_template('category.html', 
+    category = category, cat_name = cat_name)
 
 
 @app.route('/login')
@@ -157,7 +178,9 @@ def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.
     digits) for x in xrange(32))
     login_session['state'] = state
-    return render_template('login.html', state = login_session['state'], CLIENT_ID = CLIENT_ID)
+    return render_template('login.html', 
+    state = login_session['state'], 
+    CLIENT_ID = CLIENT_ID)
 
 
 @app.route('/gconnect', methods=['POST'])
@@ -168,20 +191,23 @@ def gconnect():
         return response
     code = request.data
     try:
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets(
+            'client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
-        response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
+        response = make_response(
+            json.dumps('Failed to upgrade the authorization code.')
+            , 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     access_token = credentials.access_token
-    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' 
+    % access_token)
     h = httplib2.Http()
     response = h.request(url, 'GET')[1]
-    string_response = response.decode('utf-8')
-    result = json.loads(string_response)
+    result = json.loads(response)
     # If there was an error
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
@@ -200,7 +226,9 @@ def gconnect():
     stored_credentials = login_session.get('credentials')
     stored_google_id = login_session.get('google_id')
     if stored_credentials is not None and google_id == stored_google_id:
-        response = make_response(json.dumps('Current user is already connected'), 200)
+        response = make_response(
+            json.dumps('Current user is already connected')
+            , 200)
         response.headers['Content-Type'] = 'application/json'
         return response
             
@@ -212,7 +240,7 @@ def gconnect():
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo/"
     params = {'access_token': access_token, 'alt':'json'}
     answer = requests.get(userinfo_url, params=params)
-    data = json.loads(answer.text)
+    data = answer.json()
 
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
@@ -223,7 +251,7 @@ def gconnect():
     user_id = getUserId(login_session['email'])
     if not user_id:
         user_id = createUser(login_session)
-        login_session['user_id'] = user_id
+    login_session['user_id'] = user_id
 
     output = ''
     output += '<h1>Welcome'
@@ -240,7 +268,9 @@ def gconnect():
 def gdisconnect():
     credentials = login_session.get('access-token')
     if credentials is None:
-        response = make_response(json.dumps('Current user not connected'), 401)
+        response = make_response(
+            json.dumps('Current user not connected')
+            , 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # execute HTTP GET request to revoke current token
@@ -267,19 +297,25 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
-        response = make_response(json.dumps('Failed to revoke user.. session already expired'), 400)
+        response = make_response(
+            json.dumps('Failed to revoke user.. session already expired')
+            , 400)
         response.headers['Content-Type'] = 'application/json'
         return response
 
 
 # Helper function
 def createUser(login_session):
-    new_user = User(name = login_session['username'], 
-    email = login_session['email'], picture = login_session['picture'])
     session = DBSession()
+    new_user = User(name = login_session['username'], 
+    email = login_session['email'],
+     picture = login_session['picture'])
+
     session.add(new_user)
     session.commit()
-    user = session.query(User).filter_by(email = login_session['email']).one()
+
+    user = session.query(User).filter_by(
+        email = login_session['email']).one()
     return user.id
 
 
@@ -293,6 +329,15 @@ def getUserId(email):
     try:
         session = DBSession()
         user = session.query(User).filter_by(email = email).one()
-        return user
+        return user.id
     except:
         return None
+
+#JSON ENDPOINTS
+@app.route('/')
+@app.route('/')
+@app.route('/')
+
+
+if __name__ == '__main__':
+    app.debug = True

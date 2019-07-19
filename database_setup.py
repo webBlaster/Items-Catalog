@@ -14,6 +14,15 @@ class User(Base):
     picture = Column(String(250))
     id = Column(Integer, primary_key = True)
 
+    @property
+    def serialize(self):
+        # Returns object data in easily serializable format
+        return{
+            'name':self.name,
+            'email':self.email,
+            'id':self.id,
+            'picture':self.picture,
+        }
 
 
 class Item(Base):
@@ -34,6 +43,7 @@ class Item(Base):
             'description':self.description,
             'id':self.id,
             'category':self.category,
+            'user_id':self.user_id,
         }
 
 engine = create_engine('sqlite:///restaurantmenu.db')
