@@ -4,7 +4,7 @@ from flask import request, redirect, flash, jsonify
 # IMPORTS FOR CRUD
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Item, engine
+from database_setup import Base, Item, User, engine
 
 # IMPORTS FOR USER LOGIN SESSION
 from flask import session as login_session
@@ -31,7 +31,7 @@ app.secret_key = 'secret'
 @app.route('/catalog/')
 def allItems():
     session = DBSession()
-    all_items = session.query(Item).all()
+    all_items = session.query(Item).order_by((Item.id).desc())
     if 'username' in login_session:
         return render_template('authcatalog.html', all_items = all_items)
     else:
@@ -47,8 +47,9 @@ def addItem():
         name = request.form['name']
         description = request.form['desc']
         category = request.form['category']
+        user_id = login_session['user_id']
         session = DBSession()
-        new_item = Item(name = name, description = description, category = category )
+        new_item = Item(name = name, description = description, category = category, user_id = user_id)
         session.add(new_item)
         session.commit()
         return redirect(url_for('allItems'))
@@ -64,6 +65,9 @@ def editItem(item_id):
 
     session = DBSession()
     item_changing = session.query(Item).filter_by(id = item_id).one()
+    if item_changing.user_id != login_session['user_id']:
+        output = "you are unauthorized to edit this item"
+        return output
     if request.method == 'POST':
         item_changing.name = request.form['name']
         item_changing.description = request.form['desc']
@@ -82,6 +86,9 @@ def deleteItem(item_id):
         return redirect('/login')
     session = DBSession()
     item_deleting = session.query(Item).filter_by(id = item_id).one()
+    if item_deleting.user_id != login_session['user_id']:
+        output = "you are unauthorized to delete this item"
+        return output
     if request.method == 'POST':
         session.delete(item_deleting)
         session.commit()
@@ -95,6 +102,8 @@ def deleteItem(item_id):
 def viewItem(item_id):
     session = DBSession()
     item = session.query(Item).filter_by(id = item_id).one()
+    if 'username' not in login_session and item.user_id != login_session['user_id']:
+        return render_template('publicitem.html', item = item)
     return render_template('item.html', item = item)
 
 
@@ -209,6 +218,13 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+
+    # check if user exists, creates new user if not
+    user_id = getUserId(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+        login_session['user_id'] = user_id
+
     output = ''
     output += '<h1>Welcome'
     output += login_session['username']
@@ -238,6 +254,7 @@ def gdisconnect():
         #reset user session
         del login_session['access-token']
         del login_session['google_id']
+        del login_session['user_id']
         del login_session['username']
         del login_session['email']
         del login_session['picture']
@@ -246,9 +263,36 @@ def gdisconnect():
         #reset user session
         del login_session['access-token']
         del login_session['google_id']
+        del login_session['user_id']
         del login_session['username']
         del login_session['email']
         del login_session['picture']
         response = make_response(json.dumps('Failed to revoke user.. session already expired'), 400)
         response.headers['Content-Type'] = 'application/json'
         return response
+
+
+# Helper function
+def createUser(login_session):
+    new_user = User(name = login_session['username'], 
+    email = login_session['email'], picture = login_session['picture'])
+    session = DBSession()
+    session.add(new_user)
+    session.commit()
+    user = session.query(User).filter_by(email = login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    session = DBSession()
+    user = session.query(User).filter_by(id = user_id).one()
+    return user
+
+
+def getUserId(email):
+    try:
+        session = DBSession()
+        user = session.query(User).filter_by(email = email).one()
+        return user
+    except:
+        return None

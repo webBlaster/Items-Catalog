@@ -6,13 +6,25 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+class User(Base):
+    __tablename__ = 'user'
+
+    name = Column(String(80), nullable = False)
+    email = Column(String(80), nullable = False)
+    picture = Column(String(250))
+    id = Column(Integer, primary_key = True)
+
+
+
 class Item(Base):
     __tablename__ = 'item'
 
-    name = Column(String(80),nullable = False)
-    id = Column(Integer,primary_key = True)
+    name = Column(String(80), nullable = False)
+    id = Column(Integer, primary_key = True)
     description = Column(String(250))
     category = Column(String(10))
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
