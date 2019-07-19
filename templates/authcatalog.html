@@ -10,7 +10,7 @@
 </head>
 <body class="catalog">
     <div id="login-section" class="blue">
-        <a href="{{url_for('login')}}"><button class="btn red">Login to add new</button></a></button>
+        <a href="{{url_for('gdisconnect')}}"><button class="btn red">Logout</button></a></button>
     </div>
    <div class="row cart-container">
     <div class="col l4 m4 s12 center cart">
@@ -26,6 +26,7 @@
     <div class="col l8 m8 s12 center">
         <h4>Latest Items</h4>
         <ul class="items">
+                <h5 class="black-text"><a href="{{url_for('addItem')}}">Add new Item</h5></b>
                     {% for item in all_items %}
             <li><b><a href="{{url_for('viewItem', item_id = item.id)}}">{{item.name}}<span class="black-txt">({{item.category}})</span></a></b></li>
                     {% endfor %}

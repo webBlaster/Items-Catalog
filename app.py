@@ -32,12 +32,17 @@ app.secret_key = 'secret'
 def allItems():
     session = DBSession()
     all_items = session.query(Item).all()
-    return render_template('catalog.html', all_items = all_items)
+    if 'username' in login_session:
+        return render_template('authcatalog.html', all_items = all_items)
+    else:
+        return render_template('catalog.html', all_items = all_items)
 
 
 # adds a new item
 @app.route('/catalog/new/', methods = ['GET', 'POST'])
 def addItem():
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['desc']
@@ -54,6 +59,9 @@ def addItem():
 # edits an item
 @app.route('/catalog/<int:item_id>/edit/', methods=['POST', 'GET'])
 def editItem(item_id):
+    if 'username' not in login_session:
+        return redirect('/login')
+
     session = DBSession()
     item_changing = session.query(Item).filter_by(id = item_id).one()
     if request.method == 'POST':
@@ -70,6 +78,8 @@ def editItem(item_id):
 # deletes an item
 @app.route('/catalog/<int:item_id>/delete/', methods=['POST', 'GET'])
 def deleteItem(item_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     session = DBSession()
     item_deleting = session.query(Item).filter_by(id = item_id).one()
     if request.method == 'POST':
@@ -134,7 +144,7 @@ def getAstronomy():
 
 
 @app.route('/login')
-def showLogin():
+def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.
     digits) for x in xrange(32))
     login_session['state'] = state
@@ -186,7 +196,7 @@ def gconnect():
         return response
             
     # Store the access token in the session for later use.
-    login_session['credentials'] = credentials.access_token
+    login_session['access-token'] = access_token
     login_session['google_id'] = google_id
 
     #Get user info
@@ -207,11 +217,38 @@ def gconnect():
     output += login_session['picture']
     output += '">'
     return output
-@app.route('/logout')
-def logout():
-    del login_session['credentials']
-    del login_session['google_id']
-    del login_session['username']
-    del login_session['picture']
-    output = 'logout successful'
-    return output
+
+
+# disconnect a connected user
+@app.route('/gdisconnect')
+def gdisconnect():
+    credentials = login_session.get('access-token')
+    if credentials is None:
+        response = make_response(json.dumps('Current user not connected'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # execute HTTP GET request to revoke current token
+    access_token = credentials
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+    
+    if result['status'] == '200':
+        #reset user session
+        del login_session['access-token']
+        del login_session['google_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        return redirect(url_for('allItems'))
+    else:
+        #reset user session
+        del login_session['access-token']
+        del login_session['google_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        response = make_response(json.dumps('Failed to revoke user.. session already expired'), 400)
+        response.headers['Content-Type'] = 'application/json'
+        return response
