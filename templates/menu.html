@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href={{url_for('static', filename ='styles.css')}}>
+    <link rel="stylesheet" href={{url_for('static', filename ='materialize/css/materialize.min.css')}}>
+    <title>Menus</title>
+</head>
+<body class="blue-grey darken-3 white-text">
+    <h2>{{restaurant.name}}</h2>
+   <a href="{{url_for('newMenu', restaurant_id = restaurant_id)}}"><b>Create New Menu</b></a>
+   <div class="Menu-container">
+        {% if menus !=[] %}
+       {% for menu in menus %}
+       <div class="menus card white black-text">
+        <h3>{{menu.name}}</h3>
+        <p>{{menu.description}}</p>
+        <p>{{menu.course}}</p>
+        <span>
+            <b>{{menu.price}}</b>
+            <a href="{{url_for('editMenu', restaurant_id = restaurant_id, menu_id = menu.id)}}">Edit</a>
+            <a href="{{url_for('deleteMenu', restaurant_id = restaurant_id, menu_id = menu.id)}}">Delete</a>
+        </span>
+       </div>
+       {% endfor %}
+       {% else %}
+       <h2>No Menu Available</h2>
+       {% endif %}
+   </div>
+</body>
+</html>

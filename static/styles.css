@@ -1,0 +1,45 @@
+/* Universal */
+body{
+    text-align:center;
+    color:black;
+}
+a{
+    color:black;
+}
+
+/* Catalog page */
+.catalog{
+    height: 100vh !important;
+}
+#login-section{
+    padding:10px;
+}
+.black-txt{
+    color:black !important;
+}
+.cart-container{
+    height: 88vh !important;
+}
+.cart{
+    border-right: 2px solid black !important;
+    height: 91.6vh !important;
+}
+
+@media screen and (max-width:700px){
+    .cart{
+        border:none !important;
+        height:200px !important;
+    }
+}
+
+/* Item page */
+.item-info{
+    margin-top:20vh !important;
+}
+/*Menus*/
+.menus{
+    width:80%;
+    margin:20px auto !important;
+    padding:50px;
+    border-radius: 10px !important;
+}
