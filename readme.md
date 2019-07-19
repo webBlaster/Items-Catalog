@@ -1,14 +1,10 @@
-# LOGS ANALYSIS
+# ITEMS CATALOG
 
 ## ABOUT
-a Udacity project where you answer three questions with sql on a large database
-the questions include:
-1, what are the top three most popular post of all time
-2, who are the top three authors that got the most views
-3, on which day did more than one percent of request led to errors
+a web app that displays items in different categories
 
 ## SETUP
-to run this program you need a virtual machine(VM) that runs a SQL databse server and 
+to run this program you need a virtual machine(VM)
 the web app that uses it
 the tools which will be used to install and manage the VM will be Vagrant and VirtualBox
 ### INSTALLING VIRTUALBOX
@@ -22,16 +18,3 @@ the VM's filesystem. You can get it [here](https://www.vagrantup.com/downloads.h
 
 ### DOWNLOADING VM CONGIGURATION
 You can use Github to fork and clone the repository https://github.com/udacity/fullstack-nanodegree-vm
-## VIEWS
-this project contains two views err and req
-which are used in question three
-
-### VIEW SETUP
-first view:
-
-create view err as select cast(time as date) as date,count(*) from log where status !='200 OK' group by date order by count(*) desc;
-
-second view:
-
-create view req as select cast(time as date) as date,count(*) as num from log
-group by date order by num desc;
