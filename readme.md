@@ -35,7 +35,7 @@ vagrant ssh
 3. If your shell prompt starts with the word "vagrant", you're logged into your Linux VM.
 
 ```
-This will create a database of starter dessert items and categories.
+This will create a database of all necessary tables
 
  ### Run app.py
  Run the following command:
@@ -48,7 +48,7 @@ This will create a database of starter dessert items and categories.
  ```
  
  ### Turn off web server
- Press CTRL+C to turn off the web server. This will stop the Dessert Catalog.
+ Press CTRL+C to turn off the web server.
  
  ### Exit Vagrant
  Run the following command to exit vagrant,
