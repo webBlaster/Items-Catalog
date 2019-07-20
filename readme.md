@@ -20,7 +20,7 @@ the VM's filesystem. You can get it [here](https://www.vagrantup.com/downloads.h
 You can use Github to fork and clone the repository https://github.com/udacity/fullstack-nanodegree-vm
 
 ### Download the repo
-1. Clone the repo: https://github.com/kcalata/Item-Catalog.git into the directory of your choosing.
+1. Clone the repo: https://github.com/webBlaster/Items-Catalog into the directory of your choosing.
 2. In your terminal, move into the directory containing the files of my project.
 
 ### Start the virtual machine
@@ -34,10 +34,6 @@ vagrant ssh
 ```
 3. If your shell prompt starts with the word "vagrant", you're logged into your Linux VM.
 
-### Load the data
-In your terminal, run the following:
-```
-python desserts.py
 ```
 This will create a database of starter dessert items and categories.
 
@@ -50,10 +46,6 @@ This will create a database of starter dessert items and categories.
  ```
  python3 app.py
  ```
- 
- ### Play around in the Dessert Catalog
- Play around in the [Dessert Catalog](http://localhost:8000/catalog).
- You may check out the desserts that I have set as the defaults. You can even add, edit, or delete your own dessert items after logging in through Google.
  
  ### Turn off web server
  Press CTRL+C to turn off the web server. This will stop the Dessert Catalog.
