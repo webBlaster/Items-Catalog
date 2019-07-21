@@ -42,10 +42,6 @@ This will create a database of all necessary tables
  ```
  python app.py
  ```
- or, if the above doesn't work
- ```
- python3 app.py
- ```
  
  ### Turn off web server
  Press CTRL+C to turn off the web server.
