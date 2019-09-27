@@ -26,7 +26,7 @@ import requests
 app = Flask(__name__)
 
 CLIENT_ID = json.loads(
-    open('/var/www/catalog/ItemsCatalog/client_secrets.json', 'r').read()
+    open('client_secrets.json', 'r').read()
     )['web']['client_id']
 
 Base.metadata.bind = engine
