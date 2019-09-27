@@ -14,6 +14,7 @@ from database_setup import Base, Item, User, engine
 from flask import session as login_session
 import random
 import string
+import os
 
 # IMPORTS FOR TALKING TO GOOGLE SERVERS
 from oauth2client.client import flow_from_clientsecrets
