@@ -49,5 +49,5 @@ class Item(Base):
 
 
 # engine = create_engine('postgresql://catalog:catalog@localhost/catalog')
-engine = create_engine('sqlite:///')
+engine = create_engine('sqlite:///restaurantmenu')
 Base.metadata.create_all(engine)
