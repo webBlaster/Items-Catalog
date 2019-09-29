@@ -3,7 +3,7 @@
 body{
     text-align:center;
     color:black;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat', sans-serif !important;
 }
 a{
     color:black;
